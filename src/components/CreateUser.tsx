@@ -1,10 +1,10 @@
 import React, { useState, FormEvent } from 'react';
 
 interface UserInfo {
-    id:string,
+    uid:string,
     name: string;
     email: string;
-    tel:string
+    phone_number:string
 }
 
 export const CreateUser: React.FC = () => {
@@ -13,22 +13,44 @@ export const CreateUser: React.FC = () => {
     const [name, setName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [id, setId] = useState<string>('');
-    const [tel, setTel] = useState<string>('');
+    const [phone_number, setphone_number] = useState<string>('');
 
 
-    const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const userInfo: UserInfo = {
-            id:id,
+            uid:id,
             name: name,
             email: email,
-            tel:tel
+            phone_number:phone_number
         };
+
+        try {
+            const apiKey = 'wys_a9Z9DI33LJYQB7RGvvA3ErbMorC1cc1b9zmC';
+            const response = await fetch('https://39cfa462c38b4e59bcbe5a689f31a36c.weavy.io/api/users', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userInfo)
+            });
+
+            if (response.ok) {
+                alert('User created successfully!');
+            } else {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
+        } catch (error) {
+            console.error('Error creating user:', error);
+            alert('An error occurred while creating the user. Please try again later.');
+        }
         // setSavedUserInfo(userInfo);
         setName('');
         setEmail('');
         setId('');
-        setTel('');
+        setphone_number('');
     };
 
     return (
@@ -48,7 +70,7 @@ export const CreateUser: React.FC = () => {
                 </label>
                 <br/>
                 <label>Contact:
-                    <input type="tel" value={tel} onChange={(e) => setTel(e.target.value)} required/>
+                    <input type="tel" value={phone_number} onChange={(e) => setphone_number(e.target.value)} required/>
                 </label>
                 <br/>
                 <button type="submit">Save</button>
